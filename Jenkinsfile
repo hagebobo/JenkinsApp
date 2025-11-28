@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'hagebobo/my-web-app'          // Docker Hub repo
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credentials ID
+        DOCKER_IMAGE = 'hagebobo/my-web-app'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
     }
 
     stages {
@@ -18,16 +18,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image..."
-                sh 'docker build -t hagebobo/my-web-app:latest .'
+                bat "docker build -t %DOCKER_IMAGE% ."
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                echo "Logging in to Docker Hub and pushing image..."
+                echo "Logging in and pushing to Docker Hub..."
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push hagebobo/my-web-app:latest'
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    bat "docker push %DOCKER_IMAGE%"
                 }
             }
         }
